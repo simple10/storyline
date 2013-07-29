@@ -1,5 +1,4 @@
 #=require vendor/zepto
-# OR vendor/jquery
 
 
 #
