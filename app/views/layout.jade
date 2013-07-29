@@ -1,0 +1,10 @@
+doctype 5
+html(lang='en')
+  head
+    title= title
+    != css('app')
+    != js('head')
+  body
+    block content
+    block js
+      != js('app')

@@ -1,0 +1,33 @@
+{
+  "name": "nodestack",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "cake start"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": ">=1.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/simple10/nodestack.git"
+  },
+  "dependencies": {
+    "express": "*",
+    "jade": "*",
+    "stylus": "*",
+    "stylus-type-utils": "*",
+    "nib": "*",
+    "coffee-script": "*",
+    "connect-assets": "*"
+  },
+  "devDependencies": {
+    "node-dev": "*",
+    "mocha": "*",
+    "should": "*",
+    "npmedge": "*",
+    "superagent": "*",
+    "colorize": "*"
+  }
+}
