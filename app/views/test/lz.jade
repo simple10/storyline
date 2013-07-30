@@ -7,6 +7,7 @@ block content
       Text to compress...
   div
     button#runButton Run Tests
+  #stats
   ul#output
 
 
@@ -15,42 +16,51 @@ append js
     var $input = $('#inputText'),
         $button = $('#runButton'),
         $output = $('#output'),
+        $stats = $('#stats'),
         iterations = 50,
-        duplicate = 100,
+        duplicate = 1,
         outliers = Math.ceil(iterations * 0.1)
 
     $button.on('click', function(evt){
       evt.preventDefault()
-      $output.html('')
+      $output.html('<li><b>compessToUTF16</b></li>')
       var str = ''
       for (var i=0; i<duplicate; i++)
         str += $input.val()
+      showStats(str)
       run(str, 0, [])
     })
 
     function run (txt, i, times) {
       var start = null,
           delta = null,
-          cmplen = 0
       start = (new Date).getTime()
-      cmplen = LZString.compress(txt).length
+      LZString.compressToUTF16(txt)
       delta = (new Date).getTime() - start
       times.push(delta)
       $output.append('<li><b>' +  i + ':</b> ' + format_time(delta) + '</li>')
       if (i < iterations)
         _.defer(function(){run(txt, i+1, times)})
       else
-        done(times, cmplen / txt.length)
+        done(times)
     }
 
-    function done(times, percent) {
+    function done(times) {
       times = times.sort().slice(0, iterations - outliers)
       var avg = _.reduce(times, function(a,b){ return a+b }) / times.length
-      percent = 100 - (percent * 100).toFixed(2)
-      $output.prepend(
-        '<li><b>Average: ' + format_time(avg) + '</b></li>' +
-        '<li><b>Compression: ' + percent + '%</b></li>'
-      )
+      $stats.append('<div><b>Average Time: ' + format_time(avg) + '</b></div>')
+    }
+
+    function showStats(txt) {
+      $stats.html('<div>Calculating compressions stats...</div>')
+      writeStat('compress', LZString.compress(txt).length, txt.length)
+      writeStat('compressToUTF16', LZString.compressToUTF16(txt).length, txt.length)
+      writeStat('compressToBase64', LZString.compressToBase64(txt).length, txt.length)
+      $stats.children().first().remove()
+    }
+
+    function writeStat(label, len, txtlen) {
+      $stats.append('<div><b>'+label+':</b> '+(100 - (len / txtlen * 100)).toFixed(2)+'% .... '+txtlen+' -> '+len+'</div>')
     }
 
     function format_time(time) {
