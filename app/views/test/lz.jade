@@ -1,0 +1,61 @@
+extends ../layout
+
+block content
+  h1 LZ String Performance Test
+  div
+    textarea#inputText.
+      Text to compress...
+  div
+    button#runButton Run Tests
+  ul#output
+
+
+append js
+  script.
+    var $input = $('#inputText'),
+        $button = $('#runButton'),
+        $output = $('#output'),
+        iterations = 50,
+        duplicate = 100,
+        outliers = Math.ceil(iterations * 0.1)
+
+    $button.on('click', function(evt){
+      evt.preventDefault()
+      $output.html('')
+      var str = ''
+      for (var i=0; i<duplicate; i++)
+        str += $input.val()
+      run(str, 0, [])
+    })
+
+    function run (txt, i, times) {
+      var start = null,
+          delta = null,
+          cmplen = 0
+      start = (new Date).getTime()
+      cmplen = LZString.compress(txt).length
+      delta = (new Date).getTime() - start
+      times.push(delta)
+      $output.append('<li><b>' +  i + ':</b> ' + format_time(delta) + '</li>')
+      if (i < iterations)
+        _.defer(function(){run(txt, i+1, times)})
+      else
+        done(times, cmplen / txt.length)
+    }
+
+    function done(times, percent) {
+      times = times.sort().slice(0, iterations - outliers)
+      var avg = _.reduce(times, function(a,b){ return a+b }) / times.length
+      percent = 100 - (percent * 100).toFixed(2)
+      $output.prepend(
+        '<li><b>Average: ' + format_time(avg) + '</b></li>' +
+        '<li><b>Compression: ' + percent + '%</b></li>'
+      )
+    }
+
+    function format_time(time) {
+      if (time > 1000) {
+        return (time / 1000).toFixed(4) + " sec";
+      }
+      return time.toFixed(0) + " ms";
+    }
